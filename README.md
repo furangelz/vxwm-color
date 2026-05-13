@@ -8,7 +8,7 @@ vxwm represents a significantly enhanced version of `dwm` that maintains its
 lightweight nature while offering modular flexibility. Instead of manually
 applying patches, you can toggle pre-installed features directly in the
 configuration by switching values between 0 and 1, it is all manageable via
-`modules.def.h`.
+`modules.h`.
 
 The defining feature of vxwm is its implementation of infinite tags. While
 traditional tiling managers act like a slide projector, swapping one static view
@@ -19,31 +19,31 @@ space, snap focus to a specific window, or return to the origin using the
 homecanvas bind. Even though this sounds complex, this isn't resource hungry and
 isn't hard to use.
 
-### vxwm has repositories
+### vxwm has repositories on
 
 - [Codeberg](https://codeberg.org/wh1tepearl/vxwm)
 - [GitHub (read-only mirror)](https://github.com/wh1tepearll/vxwm)
 
 ## Build and Requirements
 
-In order to build vxwm you need the `Xlib`, `Xft` and `Xinerama` header files.
+In order to build vxwm you need the `Xlib`, `Xft`, `Xinerama` header files and some sort of `make`.
 
 Arch Linux:
 
 ```bash
-sudo pacman -Sy libx11 libxft libxinerama
+sudo pacman -Sy libx11 libxft libxinerama make
 ```
 
 Void Linux:
 
 ```bash
-sudo xbps-install -S libX11 libX11-devel libXft libXft-devel libXinerama libXinerama-devel
+sudo xbps-install -S libX11 libX11-devel libXft libXft-devel libXinerama libXinerama-devel make
 ```
 
 Gentoo GNU/Linux:
 
 ```bash
-doas emerge -av x11-libs/libX11 x11-libs/libXft x11-libs/libXinerama
+doas emerge -av x11-libs/libX11 x11-libs/libXft x11-libs/libXinerama make
 ```
 
 ## Installation
