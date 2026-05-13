@@ -177,6 +177,7 @@ static const Key keys[] = {
   { MODKEY|ShiftMask,             XK_Up,     movecanvas,       {.i = 2} }, // Move your position up
   { MODKEY|ShiftMask,             XK_Down,   movecanvas,       {.i = 3} }, // Move your position down
   { MODKEY|ShiftMask,             XK_d,      centerwindow,     {0} },
+  { MODKEY|ControlMask,           XK_z,      pinwindow,        {0} },
 #endif
 #if DIRECTIONAL_FOCUS
 	{ ALTERNATE_MODKEY,             XK_Left,   focusdir,       {.i = 0 } }, // left

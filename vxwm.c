@@ -141,6 +141,7 @@ struct Client {
   int saved_cx, saved_cy;
   int saved_cw, saved_ch;
   int was_on_canvas;
+  int is_pinned;
 #endif
 #if WINDOWMAP
   int ismapped;
@@ -1789,6 +1790,10 @@ restack(Monitor *m)
       }
     }
     XRaiseWindow(dpy, m->barwin);
+    /* raise pinned windows because it is annoying when they are below others */
+    for (c = m->stack; c; c = c->snext)
+      if (ISVISIBLE(c) && c->is_pinned)
+        XRaiseWindow(dpy, c->win);
   }
 #endif
 	XSync(dpy, False);

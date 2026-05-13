@@ -13,7 +13,7 @@ homecanvas(const Arg *arg) {
     int cy = selmon->canvas[tagidx].cy;
     
     for (c = selmon->clients; c; c = c->next) {
-        if (c->tags & (1 << tagidx)) {
+        if ((c->tags & (1 << tagidx)) && !c->is_pinned) {
             c->x -= cx;
             c->y -= cy;
             XMoveWindow(dpy, c->win, c->x, c->y);
@@ -53,7 +53,7 @@ movecanvas(const Arg *arg)
 
 	Client *c;
 	for (c = selmon->clients; c; c = c->next) {
-		if (ISVISIBLE(c)) {
+		if (ISVISIBLE(c) && !c->is_pinned) {
 			c->x -= dx;
 			c->y -= dy;
 			XMoveWindow(dpy, c->win, c->x, c->y);
@@ -117,7 +117,7 @@ movecanvasmouse(const Arg *arg) {
             accum_y -= dy;
 
             for (Client *c = selmon->clients; c; c = c->next) {
-                if (c->tags & (1 << tagidx)) {
+                if ((c->tags & (1 << tagidx)) && !c->is_pinned) {
                     c->x += dx;
                     c->y += dy;
                     XMoveWindow(dpy, c->win, c->x, c->y);
@@ -193,10 +193,13 @@ centerwindow(const Arg *arg)
   if (!c || !c->mon || c->mon->lt[c->mon->sellt]->arrange != NULL)
     return;
 
+  if (c->is_pinned)
+    return;
+
   Monitor *m = c->mon;
   int tagidx = getcurrenttag(m);
 
-  int dx = (m->wx + m->ww - WIDTH(c)) / 2 - c->x;
+  int dx = m->wx + (m->ww - WIDTH(c)) / 2 - c->x;
   int dy = m->wy + (m->wh / 2) - (c->y + HEIGHT(c) / 2);
 
   if (dx == 0 && dy == 0)
@@ -204,7 +207,7 @@ centerwindow(const Arg *arg)
 
   Client *tmp;
   for (tmp = m->clients; tmp; tmp = tmp->next) {
-    if (ISVISIBLE(tmp)) {
+    if (ISVISIBLE(tmp) && !tmp->is_pinned) {
       tmp->x += dx;
       tmp->y += dy;
       XMoveWindow(dpy, tmp->win, tmp->x, tmp->y);
@@ -215,4 +218,14 @@ centerwindow(const Arg *arg)
   m->canvas[tagidx].cy += dy;
 
   drawbar(m);
+}
+
+void
+pinwindow(const Arg *arg) {
+  Client *c = selmon->sel;
+  if (!c)
+    return;
+  c->is_pinned = !c->is_pinned;
+  restack(selmon);
+  drawbar(selmon);
 }
