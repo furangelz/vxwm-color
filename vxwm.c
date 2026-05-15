@@ -1396,15 +1396,14 @@ void
 movemouse(const Arg *arg)
 {
 	int x, y, ocx, ocy, nx, ny;
-	Client *c;
+	Client *c, *cc, *p;
 	Monitor *m;
 	XEvent ev;
 #if LOCK_MOVE_RESIZE_REFRESH_RATE
 	Time lasttime = 0;
-#endif //LOCK_MOVE_RESIZE_REFRESH_RATE
-	if (!(c = selmon->sel))
-		return;
-	if (c->isfullscreen) /* no support moving fullscreen windows by mouse */
+#endif
+
+	if (!(c = selmon->sel) || c->isfullscreen)
 		return;
 	restack(selmon);
 	ocx = c->x;
@@ -1416,7 +1415,7 @@ movemouse(const Arg *arg)
 		return;
 	do {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
-		switch(ev.type) {
+		switch (ev.type) {
 		case ConfigureRequest:
 		case Expose:
 		case MapRequest:
@@ -1427,8 +1426,7 @@ movemouse(const Arg *arg)
 			if ((ev.xmotion.time - lasttime) <= (1000 / refreshrate))
 				continue;
 			lasttime = ev.xmotion.time;
-#endif //LOCK_MOVE_RESIZE_REFRESH_RATE
-
+#endif
 			nx = ocx + (ev.xmotion.x - x);
 			ny = ocy + (ev.xmotion.y - y);
 			if (abs(selmon->wx - nx) < snap)
@@ -1439,116 +1437,51 @@ movemouse(const Arg *arg)
 				ny = selmon->wy;
 			else if (abs((selmon->wy + selmon->wh) - (ny + HEIGHT(c))) < snap)
 				ny = selmon->wy + selmon->wh - HEIGHT(c);
-#if !MOVE_IN_TILED
+#if MOVE_IN_TILED
+			if (selmon->lt[selmon->sellt]->arrange && !c->isfloating) {
+				if ((m = recttomon(ev.xmotion.x_root, ev.xmotion.y_root, 1, 1)) != selmon) {
+					sendmon(c, m);
+					selmon = m;
+					focus(NULL);
+				}
+				for (cc = c->mon->clients; cc; cc = cc->next)
+					if (cc != c && !cc->isfloating && ISVISIBLE(cc)
+					&& ev.xmotion.x_root > cc->x && ev.xmotion.x_root < cc->x + cc->w
+					&& ev.xmotion.y_root > cc->y && ev.xmotion.y_root < cc->y + cc->h)
+						break;
+				if (cc) {
+					Client *ps = NULL, *pf = NULL;
+					for (p = c->mon->clients; p; p = p->next) {
+						if (p->next == c) ps = p;
+						if (p->next == cc) pf = p;
+					}
+					if (c->next == cc) {
+						if (ps) ps->next = cc; else c->mon->clients = cc;
+						c->next = cc->next;
+						cc->next = c;
+					} else if (cc->next == c) {
+						if (pf) pf->next = c; else c->mon->clients = c;
+						cc->next = c->next;
+						c->next = cc;
+					} else {
+						if (ps) ps->next = cc; else c->mon->clients = cc;
+						if (pf) pf->next = c; else c->mon->clients = c;
+						Client *tmp = c->next;
+						c->next = cc->next;
+						cc->next = tmp;
+					}
+					focus(c);
+					arrange(c->mon);
+				}
+				break;
+			}
+#else
 			if (!c->isfloating && selmon->lt[selmon->sellt]->arrange
 			&& (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
 				togglefloating(NULL);
 #endif
 			if (!selmon->lt[selmon->sellt]->arrange || c->isfloating)
 				resize(c, nx, ny, c->w, c->h, 1);
-#if MOVE_IN_TILED
-			else if (selmon->lt[selmon->sellt]->arrange || !c->isfloating) {
-				if ((m = recttomon(ev.xmotion.x_root, ev.xmotion.y_root, 1, 1)) != selmon) {
-					sendmon(c, m);
-					selmon = m;
-					focus(NULL);
-				}
-
-				Client *cc = c->mon->clients;
-				while (1) {
-					if (cc == 0) break;
-					if(
-					 cc != c && !cc->isfloating && ISVISIBLE(cc) &&
-					 ev.xmotion.x_root > cc->x &&
-					 ev.xmotion.x_root < cc->x + cc->w &&
-					 ev.xmotion.y_root > cc->y &&
-					 ev.xmotion.y_root < cc->y + cc->h ) {
-						break;
-					}
-
-					cc = cc->next;
-				}
-#if !INFINITE_TAGS
-				if (cc) {
-					Client *cl1, *cl2, ocl1;
-
-					if (!selmon->lt[selmon->sellt]->arrange) return;
-
-					cl1 = c;
-					cl2 = cc;
-					ocl1 = *cl1;
-					strcpy(cl1->name, cl2->name);
-					cl1->win = cl2->win;
-					cl1->x = cl2->x;
-					cl1->y = cl2->y;
-					cl1->w = cl2->w;
-					cl1->h = cl2->h;
-
-					cl2->win = ocl1.win;
-					strcpy(cl2->name, ocl1.name);
-					cl2->x = ocl1.x;
-					cl2->y = ocl1.y;
-					cl2->w = ocl1.w;
-					cl2->h = ocl1.h;
-
-					selmon->sel = cl2;
-
-					c = cc;
-					focus(c);
-
-					arrange(cl1->mon);
-				}
-#else // TODO: make this an option in modules.h
-				if (cc) {
-				  Client *cl1, *cl2, ocl1;
-
-				  if (!selmon->lt[selmon->sellt]->arrange) return;
-
-				  cl1 = c;
-				  cl2 = cc;
-				  ocl1 = *cl1;
-
-				  strcpy(cl1->name, cl2->name);
-				  cl1->win = cl2->win;
-				  cl1->x = cl2->x;
-				  cl1->y = cl2->y;
-				  cl1->w = cl2->w;
-				  cl1->h = cl2->h;
-
-				  cl2->win = ocl1.win;
-				  strcpy(cl2->name, ocl1.name);
-				  cl2->x = ocl1.x;
-				  cl2->y = ocl1.y;
-				  cl2->w = ocl1.w;
-				  cl2->h = ocl1.h;
-
-				  int tmp_cx = cl1->saved_cx;
-				  int tmp_cy = cl1->saved_cy;
-				  int tmp_cw = cl1->saved_cw;
-				  int tmp_ch = cl1->saved_ch;
-				  int tmp_was = cl1->was_on_canvas;
-
-				  cl1->saved_cx = cl2->saved_cx;
-				  cl1->saved_cy = cl2->saved_cy;
-				  cl1->saved_cw = cl2->saved_cw;
-				  cl1->saved_ch = cl2->saved_ch;
-				  cl1->was_on_canvas = cl2->was_on_canvas;
-
-				  cl2->saved_cx = tmp_cx;
-				  cl2->saved_cy = tmp_cy;
-				  cl2->saved_cw = tmp_cw;
-				  cl2->saved_ch = tmp_ch;
-				  cl2->was_on_canvas = tmp_was;
-
-				  selmon->sel = cl2;
-				  c = cc;
-				  focus(c);
-
-				  arrange(cl1->mon);
-		    }
-#endif
-			}
-#endif
 			break;
 		}
 	} while (ev.type != ButtonRelease);
@@ -1559,13 +1492,11 @@ movemouse(const Arg *arg)
 		focus(NULL);
 	}
 #if ENHANCED_TOGGLE_FLOATING && RESTORE_SIZE_AND_POS_ETF
-  c->wasmanuallyedited = 1;
-  if (c->isfloating) {
-    c->sfx = c->x;
-    c->sfy = c->y;
-    c->sfw = c->w;
-    c->sfh = c->h;
-  }
+	c->wasmanuallyedited = 1;
+	if (c->isfloating) {
+		c->sfx = c->x; c->sfy = c->y;
+		c->sfw = c->w; c->sfh = c->h;
+	}
 #endif
 }
 
