@@ -303,7 +303,7 @@ static Monitor *wintomon(Window w);
 static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
-static void zoom(const Arg *arg);
+static void swapmaster(const Arg *arg);
 
 #include "modules/vxwm_includes.h"
 
@@ -2728,10 +2728,10 @@ xerrorstart(Display *dpy, XErrorEvent *ee)
 }
 
 void
-zoom(const Arg *arg)
+swapmaster(const Arg *arg)
 {
 	Client *c = selmon->sel;
-#if WARP_TO_CLIENT && WARP_TO_CENTER_OF_ZOOMED_WINDOW
+#if WARP_TO_CLIENT && WARP_TO_CENTER_OF_SWAPMASTERED_WINDOW
   Client *target = c;
 #endif
 
@@ -2740,7 +2740,7 @@ zoom(const Arg *arg)
 	if (c == nexttiled(selmon->clients) && !(c = nexttiled(c->next)))
 		return;
 	pop(c);
-#if WARP_TO_CLIENT && WARP_TO_CENTER_OF_ZOOMED_WINDOW
+#if WARP_TO_CLIENT && WARP_TO_CENTER_OF_SWAPMASTERED_WINDOW
   warptoclient(target);
 #endif
 }

@@ -73,7 +73,7 @@ Even though this sounds complex, it is actually pretty lightweight, and is very 
 #define WARP_TO_CLIENT 0 // Includes the warp to client function needed for all options below.
 #define WARP_TO_CENTER_OF_NEW_WINDOW 0 // Warps the cursor to center of the new window.
 #define WARP_TO_CENTER_OF_PREVIOUS_WINDOW 0 // Warps cursor to center of the previous window after closing a window.
-#define WARP_TO_CENTER_OF_ZOOMED_WINDOW 0 // Warps cursor to center of the window that was zoomed using zoom function.
+#define WARP_TO_CENTER_OF_SWAPMASTERED_WINDOW 0 // Warps cursor to center of the window that was swapped using swapmaster function.
 #define WARP_TO_CENTER_OF_WINDOW_AFFECTED_BY_INCNMASTER 0 // Warps the cursor to center of the window that gets affected in use of incnmaster.
 #define WARP_TO_CENTER_OF_WINDOW_AFFECTED_BY_ENHANCED_TOGGLE_FLOATING 0 // Warps cursor to center of the window that was affected by using enhancedtogglefloating function.
 #define WARP_TO_CENTER_OF_WINDOW_AFFECTED_BY_FOCUSSTACK 0 // Warps cursor to center of the window that was focused by using focusstack function. 
