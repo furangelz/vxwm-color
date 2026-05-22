@@ -882,10 +882,14 @@ drawbar(Monitor *m)
     #define COORDINATES_DIVISOR 1
   #endif
 
+  #ifndef COORDINATES_STYLE
+    #define COORDINATES_STYLE "[x%d y%d]"
+  #endif
+
   if (selmon->lt[selmon->sellt]->arrange == NULL) {
     int tagidx = getcurrenttag(m);
     char coords[64];
-    snprintf(coords, sizeof(coords), "x%d y%d", 
+    snprintf(coords, sizeof(coords), COORDINATES_STYLE, 
       m->canvas[tagidx].cx / COORDINATES_DIVISOR,
       m->canvas[tagidx].cy / COORDINATES_DIVISOR);
     w = TEXTW(coords);
