@@ -316,8 +316,10 @@ static int bh;               /* bar height */
 static int lrpad;            /* sum of left and right padding for text */
 
 #if BAR_PADDING
-static int vp;               /* vertical padding for bar */
-static int sp;               /* side padding for bar */
+static int tvp;              /* top vertical padding for bar */
+static int bvp;              /* bottom vertical padding for bar */
+static int lsp;              /* left side padding for bar */
+static int rsp;              /* right side padding for bar */
 #endif
 
 static int (*xerrorxlib)(Display *, XErrorEvent *);
@@ -680,7 +682,7 @@ configurenotify(XEvent *e)
 #if !BAR_PADDING
 				XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, m->ww, bh);
 #else
-        XMoveResizeWindow(dpy, m->barwin, m->wx + sp, m->by + vp, m->ww -  2 * sp, bh);
+        XMoveResizeWindow(dpy, m->barwin, m->wx + lsp, m->by + (m->topbar ? tvp : bvp), m->ww - lsp - rsp, bh);
 #endif
 			}
 			focus(NULL);
@@ -841,7 +843,7 @@ drawbar(Monitor *m)
 #if !BAR_PADDING
 		drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext, 0);
 #else
-    drw_text(drw, m->ww - tw - 2 * sp, 0, tw, bh, 0, stext, 0);
+    drw_text(drw, m->ww - tw - lsp - rsp, 0, tw, bh, 0, stext, 0);
 #endif
 	}
 
@@ -883,7 +885,7 @@ drawbar(Monitor *m)
   if (selmon->lt[selmon->sellt]->arrange == NULL) {
     int tagidx = getcurrenttag(m);
     char coords[64];
-    snprintf(coords, sizeof(coords), "[x%d y%d]", 
+    snprintf(coords, sizeof(coords), "x%d y%d", 
       m->canvas[tagidx].cx / COORDINATES_DIVISOR,
       m->canvas[tagidx].cy / COORDINATES_DIVISOR);
     w = TEXTW(coords);
@@ -904,7 +906,7 @@ drawbar(Monitor *m)
 #if !BAR_PADDING
 			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
 #else
-      drw_text(drw, x, 0, w - 2 * sp, bh, lrpad / 2, m->sel->name, 0);
+      drw_text(drw, x, 0, w - lsp - rsp, bh, lrpad / 2, m->sel->name, 0);
 #endif
 			if (m->sel->isfloating)
 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
@@ -913,7 +915,7 @@ drawbar(Monitor *m)
 #if !BAR_PADDING
 			drw_rect(drw, x, 0, w, bh, 1, 1);
 #else
-      drw_rect(drw, x, 0, w - 2 * sp, bh, 1, 1);
+      drw_rect(drw, x, 0, w - lsp - rsp, bh, 1, 1);
 #endif
 		}
 	}
@@ -1960,8 +1962,10 @@ setup(void)
 #endif
 	updategeom();
 #if BAR_PADDING
-  sp = sidepad;
-  vp = (topbar == 1) ? vertpad : - vertpad;
+  lsp = left_sidepad;
+  rsp = right_sidepad;
+  tvp = top_vertpad;
+  bvp = -bottom_vertpad;
 #endif
 	/* init atoms */
 	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
@@ -2204,8 +2208,8 @@ togglebar(const Arg *arg)
 #if !BAR_PADDING
     XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, bar_y, selmon->ww, bh);
 #else
-    int final_y = (selmon->showbar) ? (bar_y + vp) : bar_y;
-    XMoveResizeWindow(dpy, selmon->barwin, selmon->wx + sp, final_y, selmon->ww - 2 * sp, bh);
+    int final_y = (selmon->showbar) ? (bar_y + (selmon->topbar ? tvp : bvp)) : bar_y;
+    XMoveResizeWindow(dpy, selmon->barwin, selmon->wx + lsp, final_y, selmon->ww - lsp - rsp, bh);
 #endif
 
     arrange(selmon);
@@ -2337,7 +2341,7 @@ updatebars(void)
 #if !BAR_PADDING
 		m->barwin = XCreateWindow(dpy, root, m->wx, m->by, m->ww, bh, 0, DefaultDepth(dpy, screen),
 #else
-    m->barwin = XCreateWindow(dpy, root, m->wx + sp, m->by + vp, m->ww - 2 * sp, bh, 0, DefaultDepth(dpy, screen),
+    m->barwin = XCreateWindow(dpy, root, m->wx + lsp, m->by + (m->topbar ? tvp : bvp), m->ww - lsp - rsp, bh, 0, DefaultDepth(dpy, screen),
 #endif
 				CopyFromParent, DefaultVisual(dpy, screen),
 				CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
@@ -2358,15 +2362,15 @@ updatebarpos(Monitor *m)
 		m->by = m->topbar ? m->wy : m->wy + m->wh;
 		m->wy = m->topbar ? m->wy + bh : m->wy;
 #else
-    m->wh = m->wh - vertpad - bh;
-		m->by = m->topbar ? m->wy : m->wy + m->wh + vertpad;
-		m->wy = m->topbar ? m->wy + bh + vp : m->wy;
+    m->wh = m->wh - top_vertpad - bottom_vertpad - bh;
+		m->by = m->topbar ? m->wy : m->wy + m->wh + top_vertpad + bottom_vertpad;
+		m->wy = m->topbar ? m->wy + bh + tvp : m->wy;
 #endif
 	} else
 #if !BAR_PADDING
 		m->by = -bh;
 #else
-    m->by = -bh - vp;
+    m->by = -bh - bvp;
 #endif
 #if EXTERNAL_BARS
     m->wx += m->strut_left;

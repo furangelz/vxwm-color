@@ -34,8 +34,10 @@ static const int user_bh = 0;
 #endif
 
 #if BAR_PADDING
-static const int vertpad = 5;       /* vertical padding of bar */
-static const int sidepad = 5;       /* horizontal padding of bar */
+static const int top_vertpad = 3;          /* top vertical padding of bar */ 
+static const int bottom_vertpad = 3;       /* bottom vertical padding of bar */
+static const int left_sidepad = 3;         /* left horizontal padding of bar */
+static const int right_sidepad = 3;        /* right horizontal padding of bar */
 #endif
 
 /* tagging */
