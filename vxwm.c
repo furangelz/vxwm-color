@@ -553,13 +553,16 @@ buttonpress(XEvent *e)
 	} else if ((c = wintoclient(ev->window))) {
 		focus(c);
 		restack(selmon);
-		XAllowEvents(dpy, ReplayPointer, CurrentTime);
+		if (ev->button != Button4 && ev->button != Button5)
+			XAllowEvents(dpy, ReplayPointer, CurrentTime);
 		click = ClkClientWin;
 	}
 	for (i = 0; i < LENGTH(buttons); i++)
 		if (click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button
 		&& CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
 			buttons[i].func(click == ClkTagBar && buttons[i].arg.i == 0 ? &arg : &buttons[i].arg);
+	if ((ev->button == Button4 || ev->button == Button5) && click == ClkClientWin)
+		XAllowEvents(dpy, AsyncPointer, CurrentTime);
 }
 
 void
@@ -1130,7 +1133,10 @@ grabbuttons(Client *c, int focused)
 					XGrabButton(dpy, buttons[i].button,
 						buttons[i].mask | modifiers[j],
 						c->win, False, BUTTONMASK,
-						GrabModeAsync, GrabModeSync, None, None);
+						// use GrabModeSync for scroll wheel btns so when executing binds with the scroll wheel, windows dont get the scroll input. */
+						(buttons[i].button == Button4 || buttons[i].button == Button5)
+							? GrabModeSync : GrabModeAsync,
+						GrabModeSync, None, None);
 	}
 }
 
