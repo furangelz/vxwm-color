@@ -41,6 +41,16 @@ static const int left_sidepad = 0;         /* left horizontal padding of bar */
 static const int right_sidepad = 0;        /* right horizontal padding of bar */
 #endif
 
+#define BAR_ALWAYS_ON_TOP 1 /* Makes internal bar on top of other windows. */
+
+#if EXTERNAL_BARS
+#define EXTERNAL_BARS_ALWAYS_ON_TOP 1 /* Makes external bars on top of other windows. */
+#endif
+
+#if INFINITE_TAGS
+#define PINNED_WINDOWS_ALWAYS_ON_TOP 1 /* Makes pinned windows on top of other windows */
+#endif
+
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 

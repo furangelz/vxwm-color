@@ -1715,7 +1715,7 @@ restack(Monitor *m)
 	Client *c;
 	XEvent ev;
 	XWindowChanges wc;
-#if EXTERNAL_BARS
+#if EXTERNAL_BARS && EXTERNAL_BARS_ALWAYS_ON_TOP 
   ExternalBarStrut *exb;
 #endif
 
@@ -1733,7 +1733,7 @@ restack(Monitor *m)
 				wc.sibling = c->win;
 			}
 	}
-#if INFINITE_TAGS
+#if BAR_ALWAYS_ON_TOP 
   else {
     if (m->sel && m->sel->isfullscreen)
       return;
@@ -1746,14 +1746,17 @@ restack(Monitor *m)
       }
     }
     XRaiseWindow(dpy, m->barwin);
-#if EXTERNAL_BARS
+#endif
+#if EXTERNAL_BARS && EXTERNAL_BARS_ALWAYS_ON_TOP
     for (exb = ebarstruts; exb; exb = exb->next)
       XRaiseWindow(dpy, exb->win);
 #endif
-    /* raise pinned windows because it is annoying when they are below others */
+#if INFINITE_TAGS && PINNED_WINDOWS_ALWAYS_ON_TOP
     for (c = m->stack; c; c = c->snext)
       if (ISVISIBLE(c) && c->is_pinned)
         XRaiseWindow(dpy, c->win);
+#endif
+#if BAR_ALWAYS_ON_TOP
   }
 #endif
 	XSync(dpy, False);
