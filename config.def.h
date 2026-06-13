@@ -3,7 +3,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
+static const unsigned int borderpx  = 3;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
@@ -35,10 +35,10 @@ static const int user_bh = 0;
 #endif
 
 #if BAR_PADDING
-static const int top_vertpad = 3;          /* top vertical padding of bar */ 
-static const int bottom_vertpad = 3;       /* bottom vertical padding of bar */
-static const int left_sidepad = 3;         /* left horizontal padding of bar */
-static const int right_sidepad = 3;        /* right horizontal padding of bar */
+static const int top_vertpad = 0;          /* top vertical padding of bar */ 
+static const int bottom_vertpad = 0;       /* bottom vertical padding of bar */
+static const int left_sidepad = 0;         /* left horizontal padding of bar */
+static const int right_sidepad = 0;        /* right horizontal padding of bar */
 #endif
 
 /* tagging */
@@ -99,6 +99,9 @@ static const Layout layouts[] = {
 #define MODKEY Mod4Mask
 #define ALTERNATE_MODKEY Mod1Mask
 
+#define SCROLL_UP Button4
+#define SCROLL_DOWN Button5
+
 #define TAGKEYS(KEY,TAG) \
 	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
@@ -113,6 +116,12 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() 
 static const char *dmenucmd[] = { "dmenu_run", "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
 
 static const char *termcmd[]  = { "st", NULL };
+
+#if ZOOM
+static const char *zoomin[] = { "vcompmgr", "-Z", "+0.15", NULL }; // zoom in
+static const char *zoomout[] = { "vcompmgr", "-Z", "-0.15", NULL }; // zoom out
+static const char *zoomreset[] = { "vcompmgr", "-Z", "1", NULL }; // set zoom to 1
+#endif
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
@@ -188,6 +197,11 @@ static const Key keys[] = {
 	{ ALTERNATE_MODKEY,             XK_Up,     focusdir,       {.i = 2 } }, // up
 	{ ALTERNATE_MODKEY,             XK_Down,   focusdir,       {.i = 3 } }, // down
 #endif
+#if ZOOM
+ { ALTERNATE_MODKEY,              XK_r,      spawn,          {.v = zoomreset } },
+ { MODKEY,                        XK_equal,  spawn,          {.v = zoomin } },
+ { MODKEY,                        XK_minus,  spawn,          {.v = zoomout } },
+#endif
 };
 
 /* button definitions */
@@ -195,10 +209,18 @@ static const Key keys[] = {
 static const Button buttons[] = {
 	/* click                event mask      button          function        argument */
 #if INFINITE_TAGS
-  { ClkRootWin,      MODKEY|ShiftMask,         Button1,        movecanvasmouse,     {.f = 1.5 } }, 
-  { ClkClientWin,    MODKEY|ShiftMask,         Button1,        movecanvasmouse,     {.f = 1.5 } },
+  { ClkRootWin,           MODKEY|ShiftMask,         Button1,        movecanvasmouse,     {.f = 1.5 } }, 
+  { ClkClientWin,         MODKEY|ShiftMask,         Button1,        movecanvasmouse,     {.f = 1.5 } },
+  { ClkRootWin,           0,                        Button1,        movecanvasmouse,     {.f = 1.5 } },
   /* .f = 1 is moving multiplier, for example if set to 0.5, canvas will move 2 times slower, if set to 2, canvas will move 2 times faster. 
      If you want inverted canvas move then set the value to a negative value. */
+#endif
+#if ZOOM
+  { ClkRootWin,           MODKEY,         SCROLL_UP,      spawn,          {.v = zoomin } },
+  { ClkRootWin,           MODKEY,         SCROLL_DOWN,    spawn,          {.v = zoomout } },
+
+  { ClkClientWin,         MODKEY,         SCROLL_UP,      spawn,          {.v = zoomin } },
+  { ClkClientWin,         MODKEY,         SCROLL_DOWN,    spawn,          {.v = zoomout } },
 #endif
 	{ ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
 	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },

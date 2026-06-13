@@ -1,5 +1,5 @@
 # vxwm version
-VERSION = 2.2
+VERSION = 2.3
 
 # Customize below to fit your system
 

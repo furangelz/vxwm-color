@@ -403,6 +403,7 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
 	*w = MAX(1, *w);
 	*h = MAX(1, *h);
 	if (interact) {
+#if !INFINITE_TAGS
 		if (*x > sw)
 			*x = sw - WIDTH(c);
 		if (*y > sh)
@@ -411,6 +412,7 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
 			*x = 0;
 		if (*y + *h + 2 * c->bw < 0)
 			*y = 0;
+#endif
 	} else {
 		if (*x >= m->wx + m->ww)
 			*x = m->wx + m->ww - WIDTH(c);
@@ -1414,6 +1416,9 @@ movemouse(const Arg *arg)
 #if LOCK_MOVE_RESIZE_REFRESH_RATE
 	Time lasttime = 0;
 #endif
+#if ZOOM
+  float zoom_val = zoom_value();
+#endif
 
 	if (!(c = selmon->sel) || c->isfullscreen)
 		return;
@@ -1439,8 +1444,13 @@ movemouse(const Arg *arg)
 				continue;
 			lasttime = ev.xmotion.time;
 #endif
+#if !ZOOM
 			nx = ocx + (ev.xmotion.x - x);
 			ny = ocy + (ev.xmotion.y - y);
+#else
+      nx = ocx + (ev.xmotion.x - x) / zoom_val;
+			ny = ocy + (ev.xmotion.y - y) / zoom_val;
+#endif
 			if (abs(selmon->wx - nx) < snap)
 				nx = selmon->wx;
 			else if (abs((selmon->wx + selmon->ww) - (nx + WIDTH(c))) < snap)
@@ -1705,6 +1715,9 @@ restack(Monitor *m)
 	Client *c;
 	XEvent ev;
 	XWindowChanges wc;
+#if EXTERNAL_BARS
+  ExternalBarStrut *exb;
+#endif
 
 	drawbar(m);
 	if (!m->sel)
@@ -1733,6 +1746,10 @@ restack(Monitor *m)
       }
     }
     XRaiseWindow(dpy, m->barwin);
+#if EXTERNAL_BARS
+    for (exb = ebarstruts; exb; exb = exb->next)
+      XRaiseWindow(dpy, exb->win);
+#endif
     /* raise pinned windows because it is annoying when they are below others */
     for (c = m->stack; c; c = c->snext)
       if (ISVISIBLE(c) && c->is_pinned)
