@@ -403,7 +403,9 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
 	*w = MAX(1, *w);
 	*h = MAX(1, *h);
 	if (interact) {
-#if !INFINITE_TAGS
+#if INFINITE_TAGS
+	if (selmon->lt[selmon->sellt]->arrange != NULL) {
+#endif
 		if (*x > sw)
 			*x = sw - WIDTH(c);
 		if (*y > sh)
@@ -412,6 +414,8 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
 			*x = 0;
 		if (*y + *h + 2 * c->bw < 0)
 			*y = 0;
+#if INFINITE_TAGS
+	}
 #endif
 	} else {
 		if (*x >= m->wx + m->ww)
