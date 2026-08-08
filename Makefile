@@ -37,6 +37,8 @@ install: all
 	mkdir -p ${DESTDIR}${PREFIX}/bin
 	cp -f vxwm ${DESTDIR}${PREFIX}/bin/vxwm
 	chmod 755 ${DESTDIR}${PREFIX}/bin/vxwm
+	cp -f rvx ${DESTDIR}${PREFIX}/bin/rvx
+	chmod 755 ${DESTDIR}${PREFIX}/bin/rvx
 	mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	sed "s/VERSION/${VERSION}/g" < vxwm.1 > ${DESTDIR}${MANPREFIX}/man1/vxwm.1
 	chmod 644 ${DESTDIR}${MANPREFIX}/man1/vxwm.1
