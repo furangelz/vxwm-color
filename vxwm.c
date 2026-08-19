@@ -2038,9 +2038,13 @@ setup(void)
   cursor[CurW]  = drw_cur_create(drw, XC_left_side);
 #endif
 	/* init appearance */
-	scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
-	for (i = 0; i < LENGTH(colors); i++)
-		scheme[i] = drw_scm_create(drw, colors[i], 3);
+	#if AUTO_COLOR
+autocolor_load();
+#endif
+
+scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
+for (i = 0; i < LENGTH(colors); i++)
+    scheme[i] = drw_scm_create(drw, colors[i], 3);
 	/* init bars */
 	updatebars();
 	updatestatus();

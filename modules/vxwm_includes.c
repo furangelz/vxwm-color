@@ -8,6 +8,11 @@
 #include "xrdb/xrdb.c"
 #endif
 
+#if AUTO_COLOR
+#include "autocolor/autocolor.c"
+#include "autocolor/extract.c"
+#endif
+
 #if FULLSCREEN
 #include "fullscreen/fullscreen.c"
 #endif

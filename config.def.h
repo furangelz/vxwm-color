@@ -11,20 +11,31 @@ static const char *fonts[]          = { "monospace:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
 #define COORDINATES_STYLE "[x%d y%d]" /* The style of coordinates displayed in bar, do not remove %d. */
 
-static MAYBE_CONST char normbgcolor[]           = "#222222";
-static MAYBE_CONST char normbordercolor[]       = "#444444";
-static MAYBE_CONST char normfgcolor[]           = "#bbbbbb";
-static MAYBE_CONST char selfgcolor[]            = "#eeeeee";
-static MAYBE_CONST char selbordercolor[]        = "#005577";
-static MAYBE_CONST char selbgcolor[]            = "#005577";
-static MAYBE_CONST char *colors[][3] = {
-       /*               fg           bg           border   */
-       [SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
-       [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
-};
+static MAYBE_CONST char normbgcolor[8]     = "#222222";
+static MAYBE_CONST char normbordercolor[8] = "#444444";
+static MAYBE_CONST char normfgcolor[8]     = "#bbbbbb";
+static MAYBE_CONST char selfgcolor[8]      = "#eeeeee";
+static MAYBE_CONST char selbordercolor[8]  = "#005577";
+static MAYBE_CONST char selbgcolor[8]      = "#005577";
 
+static MAYBE_CONST char *colors[][3] = {
+    [SchemeNorm] = {
+        normfgcolor,
+        normbgcolor,
+        normbordercolor
+    },
+    [SchemeSel] = {
+        selfgcolor,
+        selbgcolor,
+        selbordercolor
+    },
+};
 #define CENTER_NEW_FLOATING_WINDOWS 1 // so, basically, it does what it says. (make 0 to turn off)
 #define NEW_FLOATING_WINDOWS_APPEAR_UNDER_CURSOR 0 // so, basically, it does what it says. (make 0 to turn off) 
+
+#if AUTO_COLOR
+static const char autocolorimage[] = "/home/user/wallpaper.jpg"; // put your wallpaper path here
+#endif
 
 #if GAPS
 static const unsigned int gappx = 5;
@@ -123,7 +134,15 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
+static const char *dmenucmd[] = {
+    "dmenu_run",
+    "-fn", dmenufont,
+    "-nb", normbgcolor,
+    "-nf", normfgcolor,
+    "-sb", selbordercolor,
+    "-sf", selfgcolor,
+    NULL
+};
 
 static const char *termcmd[]  = { "st", NULL };
 
@@ -136,7 +155,7 @@ static const char *zoomreset[] = { "vcompmgr", "-Z", "1", NULL }; // set zoom to
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
-  { MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
+{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
@@ -170,6 +189,9 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
 #if XRDB
   { MODKEY,                       XK_F5,     xrdb,           {.v = NULL } },
+#endif
+#if AUTO_COLOR
+  { MODKEY,                       XK_F6,     autocolor,    {0} },
 #endif
 #if FULLSCREEN
   { MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },
