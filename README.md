@@ -1,6 +1,6 @@
 # vxwm
 
-vxwm - Versatile X Window Manager for X11 forked from `dwm`.
+vxwm-color - Versatile X Window Manager with custom automatic coloring patch.
 
 ## About
 
@@ -19,31 +19,35 @@ space, snap focus to a specific window, or return to the origin using the
 homecanvas bind. Even though this sounds complex, this isn't resource hungry and
 isn't hard to use.
 
-### vxwm has repositories on
+### original vxwm has repositories on
 
 - [Codeberg](https://codeberg.org/wh1tepearl/vxwm)
 - [GitHub (read-only mirror)](https://github.com/wh1tepearll/vxwm)
 
+### vxwm-color has repositories on
+
+- [Codeberg](https://codeberg.org/furangelz/vxwm-color)
+
 ## Build and Requirements
 
-In order to build vxwm you need the `Xlib`, `Xft`, `Xinerama` header files and some sort of `make`.
+In order to build vxwm you need the `Xlib`, `Xft`, `Xinerama`, `libjpeg` header files and some sort of `make`.
 
 Arch Linux:
 
 ```bash
-sudo pacman -Sy libx11 libxft libxinerama make
+sudo pacman -Sy libx11 libxft libxinerama libjpeg-turbo make
 ```
 
 Void Linux:
 
 ```bash
-sudo xbps-install -S libX11 libX11-devel libXft libXft-devel libXinerama libXinerama-devel make
+sudo xbps-install -S libX11 libX11-devel libXft libXft-devel libXinerama libXinerama-devel libjpeg-turbo libjpeg-turbo-devel make
 ```
 
 Gentoo GNU/Linux:
 
 ```bash
-doas emerge -av x11-libs/libX11 x11-libs/libXft x11-libs/libXinerama make
+doas emerge -av x11-libs/libX11 x11-libs/libXft x11-libs/libXinerama media-libs/libjpeg-turbo make
 ```
 
 ## Installation
@@ -51,20 +55,31 @@ doas emerge -av x11-libs/libX11 x11-libs/libXft x11-libs/libXinerama make
 Clone this repository and `cd` into it.
 
 ```bash
-git clone https://codeberg.org/wh1tepearl/vxwm.git
+git clone https://codeberg.org/furangelz/vxwm-color.git
 cd vxwm
 ```
 
 Edit `config.mk` to match your local setup (vxwm is installed into
 the `/usr/local` namespace by default).
 
-Afterwards enter the following commands to build and install vxwm:
+Now enter the following commands to build vxwm:
 
 ```bash
 make
-# yes, run make first and only then
-sudo make clean install
+make clean
 ```
+
+Now edit the newly generated `config.h` to match your wallpaper path
+and personal preferences (Just PLEASE be original if you plan on posting
+your rice on r/unixart or r/unixporn...)
+
+Afterwards run the following command to rebuild and install vxwm:
+
+```bash
+make
+doas make install
+```
+(or use sudo if you want to)
 
 ## Running vxwm
 
@@ -155,6 +170,7 @@ for the inspiration of infinite tags.
 
 Also try:
 
+- original vxwm: <https://codeberg.org/wh1tepearl/vxwm>
 - hevel wayland compositor: <https://git.sr.ht/~dlm/hevel>
 - 5element: <https://hg.sr.ht/~ohmu/5element>
 
