@@ -42,6 +42,7 @@ install: all
 	mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	sed "s/VERSION/${VERSION}/g" < vxwm.1 > ${DESTDIR}${MANPREFIX}/man1/vxwm.1
 	chmod 644 ${DESTDIR}${MANPREFIX}/man1/vxwm.1
+	cp -f wallpaper.jpg ~/wallpaper.jpg
 
 uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/vxwm\
