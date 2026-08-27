@@ -2,21 +2,21 @@
 
 /* See LICENSE file for copyright and license details. */
 
-/* uwu */
-static const unsigned int borderpx  = 3;
-static const unsigned int snap      = 0;
-static const int showbar            = 1;
-static const int topbar             = 1;
+/* appearance */
+static const unsigned int borderpx  = 3;        /* border pixel of windows */
+static const unsigned int snap      = 0;       /* snap pixel */
+static const int showbar            = 1;        /* 0 means no bar */
+static const int topbar             = 1;        /* 0 means bottom bar */
 static const char *fonts[]          = { "monospace:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
-#define COORDINATES_STYLE "[x%d y%d]"
+#define COORDINATES_STYLE "[x%d y%d]" /* The style of coordinates displayed in bar, do not remove %d. */
 
-static MAYBE_CONST char normbgcolor[8]     = "#002e56";
-static MAYBE_CONST char normbordercolor[8] = "#002e56";
-static MAYBE_CONST char normfgcolor[8]     = "#ffffff";
-static MAYBE_CONST char selfgcolor[8]      = "#ffffff";
-static MAYBE_CONST char selbordercolor[8]  = "#00549d";
-static MAYBE_CONST char selbgcolor[8]      = "#00549d";
+static MAYBE_CONST char normbgcolor[8]     = "#222222";
+static MAYBE_CONST char normbordercolor[8] = "#444444";
+static MAYBE_CONST char normfgcolor[8]     = "#bbbbbb";
+static MAYBE_CONST char selfgcolor[8]      = "#eeeeee";
+static MAYBE_CONST char selbordercolor[8]  = "#005577";
+static MAYBE_CONST char selbgcolor[8]      = "#005577";
 
 static MAYBE_CONST char *colors[][3] = {
     [SchemeNorm] = {
@@ -111,9 +111,9 @@ static const int refreshrate = 360;  /* refresh rate (per second) for client mov
 #endif //LOCK_MOVE_RESIZE_REFRESH_RATE
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-  { ">w<",      NULL },    /* no layout function means floating behavior */
-	{ "OwO",      tile },    /* first entry is default */
-	{ "UwU",      monocle },
+  { "><>",      NULL },    /* no layout function means floating behavior */
+	{ "[]=",      tile },    /* first entry is default */
+	{ "[M]",      monocle },
 };
 
 /* key definitions */
@@ -145,7 +145,6 @@ static const char *dmenucmd[] = {
 };
 
 static const char *termcmd[]  = { "st", NULL };
-static const char *esixcmd[]  = { "firefox -new-window https://e621.net", NULL };
 
 #if ZOOM
 static const char *zoomin[] = { "vcompmgr", "-Z", "+0.15", NULL }; // zoom in
@@ -155,7 +154,6 @@ static const char *zoomreset[] = { "vcompmgr", "-Z", "1", NULL }; // set zoom to
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_e,      spawn,          {.v = esixcmd } },
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 { MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
