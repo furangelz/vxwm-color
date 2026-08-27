@@ -27,6 +27,7 @@ isn't hard to use.
 ### vxwm-color has repositories on
 
 - [Codeberg](https://codeberg.org/furangelz/vxwm-color)
+- [GitHub (read-only mirror)](https://github.com/furangelz/vxwm-color)
 
 ## Build and Requirements
 
